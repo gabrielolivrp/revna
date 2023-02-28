@@ -1,0 +1,74 @@
+name: revna
+version: 0.1.0.0
+github: "gabrielolivrp/revna"
+license: BSD3
+author: "Gabriel Augusto"
+maintainer: "example@example.com"
+copyright: "2023 Gabriel Augusto"
+
+extra-source-files:
+  - README.md
+
+# Metadata used when publishing your package
+# synopsis:            Short description of your package
+# category:            Web
+
+# To avoid duplicated efforts in documentation and dealing with the
+# complications of embedding Haddock markup inside cabal files, it is
+# common to point users to the README.md file.
+description: Please see the README on GitHub at <https://github.com/gabrielolivrp/revna#readme>
+
+dependencies:
+  - base >= 4.7 && < 5
+  - text
+  - bytestring
+  - containers
+  - array
+  - mtl
+  - test-framework
+  - test-framework-quickcheck2
+  - QuickCheck
+
+default-extensions:
+  - LambdaCase
+  - ConstraintKinds
+  - FlexibleContexts
+  - OverloadedStrings
+  - ImportQualifiedPost
+  - GeneralizedNewtypeDeriving
+
+ghc-options:
+  - -Wall
+  - -Wcompat
+  - -Widentities
+  - -Wincomplete-record-updates
+  - -Wincomplete-uni-patterns
+  - -Wmissing-export-lists
+  - -Wmissing-home-modules
+  - -Wpartial-fields
+  - -Wredundant-constraints
+
+library:
+  source-dirs: src
+
+executables:
+  revna-exe:
+    main: Main.hs
+    source-dirs: app
+    ghc-options:
+      - -threaded
+      - -rtsopts
+      - -with-rtsopts=-N
+    dependencies:
+      - revna
+
+tests:
+  revna-test:
+    main: Spec.hs
+    source-dirs: test
+    ghc-options:
+      - -threaded
+      - -rtsopts
+      - -with-rtsopts=-N
+    dependencies:
+      - revna
