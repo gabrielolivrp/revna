@@ -27,6 +27,8 @@ library
       Revna.Diagnostic
       Revna.Location
       Revna.Syntax
+      Revna.Syntax.Lexer
+      Revna.Syntax.Monad
       Revna.Syntax.Token
       Revna.Syntax.Tree
   other-modules:

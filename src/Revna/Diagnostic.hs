@@ -1,6 +1,8 @@
 module Revna.Diagnostic
   ( Diagnostic (..),
     Severity (..),
+    Phase (..),
+    Snippet (..),
   )
 where
 
@@ -22,8 +24,5 @@ data Phase
   | Typing
   deriving (Show)
 
-data Snippet = Snippet
-  { loc :: Span,
-    message :: String
-  }
+data Snippet = Snippet Span String
   deriving (Show)

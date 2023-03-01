@@ -7,8 +7,6 @@ data Token
     KwModule
   | -- | the "where" keyword
     KwWhere
-  | -- | the "data" keyword
-    KwData
   | -- | the "let" keyword
     KwLet
   | -- | the "in" keyword
@@ -27,8 +25,6 @@ data Token
     SymColon
   | -- | the "=" symbol
     SymEq
-  | -- | the "_" symbol
-    SymWild
   | -- | the "," symbol
     SymComma
   | -- | the "(" symbol
