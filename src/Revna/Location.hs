@@ -1,18 +1,17 @@
-{-# LANGUAGE StandaloneKindSignatures #-}
-
 module Revna.Location
   ( Position (..),
     Span (..),
-    Located (..),
+    HasSpan (..),
     Loc (..),
     startPos,
     nextLine,
     nextColumn,
+    unlocated,
     movePos,
+    withSpan1,
+    withSpan2,
   )
 where
-
-import Data.Kind (Constraint, Type)
 
 data Position = Position
   { -- | absolute offset
@@ -24,7 +23,7 @@ data Position = Position
     -- | absolute file path of the file
     posFilepath :: !FilePath
   }
-  deriving (Show, Eq)
+  deriving (Show, Eq, Ord)
 
 data Span = Span
   { spanStart :: !Position,
@@ -34,6 +33,9 @@ data Span = Span
 
 data Loc a = Loc a Span
   deriving (Show)
+
+instance Semigroup Span where
+  (Span s1 e1) <> (Span s2 e2) = Span (min s1 s2) (max e1 e2)
 
 startPos :: FilePath -> Position
 startPos = Position 0 1 1
@@ -50,11 +52,17 @@ movePos pos '\n' =
 movePos pos _ =
   pos {posOffset = posOffset pos + 1, posCol = posCol pos + 1}
 
-type Located :: (Type -> Type) -> Constraint
-class Located f where
-  locate :: f b -> Span
-  unlocated :: f b -> b
+class HasSpan a where
+  getSpan :: a -> Span
 
-instance Located Loc where
-  locate (Loc _ s) = s
-  unlocated (Loc b _) = b
+instance HasSpan (Loc a) where
+  getSpan (Loc _ s) = s
+
+unlocated :: Loc a -> a
+unlocated (Loc b _) = b
+
+withSpan1 :: HasSpan a => a -> Span
+withSpan1 = getSpan
+
+withSpan2 :: (HasSpan a, HasSpan b) => a -> b -> Span
+withSpan2 a b = getSpan a <> getSpan b
