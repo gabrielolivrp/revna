@@ -25,6 +25,7 @@ module Revna.Syntax.Monad
     pushStartCode,
     popStartCode,
     invalidLexemeError,
+    unexpectedTokenError,
   )
 where
 
@@ -43,7 +44,7 @@ import Data.List.NonEmpty qualified as NE
 import Data.Word (Word8)
 import Revna.Diagnostic
   ( Diagnostic (..),
-    Phase (Lexer),
+    Phase (Lexer, Parser),
     Severity (Error),
     Snippet (..),
   )
@@ -212,5 +213,11 @@ popStartCode = modify go
 makeLexerError :: [Snippet] -> ParserM a
 makeLexerError snippets = throwError (Diagnostic Error Lexer snippets)
 
+makeParserError :: [Snippet] -> ParserM a
+makeParserError snippets = throwError (Diagnostic Error Parser snippets)
+
 invalidLexemeError :: Position -> ParserM a
-invalidLexemeError sp = makeLexerError [Snippet (Span sp sp) "Invalid lexeme"]
+invalidLexemeError pos = makeLexerError [Snippet (Span pos pos) "Invalid lexeme"]
+
+unexpectedTokenError :: Token -> Span -> ParserM a
+unexpectedTokenError token sp = makeParserError [Snippet sp ("Unexpected token '" <> show token <> "'")]

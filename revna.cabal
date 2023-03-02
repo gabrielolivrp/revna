@@ -29,6 +29,7 @@ library
       Revna.Syntax
       Revna.Syntax.Lexer
       Revna.Syntax.Monad
+      Revna.Syntax.Parser
       Revna.Syntax.Token
       Revna.Syntax.Tree
   other-modules:

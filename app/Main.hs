@@ -9,6 +9,10 @@ main :: IO ()
 main = do
   let filepath = "samples/Main.ra"
   contents <- BS.readFile filepath
-  case runLexer filepath contents of
-    Right tokens -> forM_ tokens (print . unlocated)
+  -- case runLexer filepath contents of
+  --   Right tokens -> forM_ tokens (print . unlocated)
+  --   Left err -> print err
+
+  case runParseModule filepath contents of
+    Right tree -> print tree
     Left err -> print err
