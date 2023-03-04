@@ -19,8 +19,8 @@ data Severity
   deriving (Show)
 
 data Phase
-  = Lexer
-  | Parser
+  = Lexing
+  | Parsing
   | Typing
   deriving (Show)
 

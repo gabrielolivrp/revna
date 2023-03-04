@@ -44,7 +44,7 @@ import Data.List.NonEmpty qualified as NE
 import Data.Word (Word8)
 import Revna.Diagnostic
   ( Diagnostic (..),
-    Phase (Lexer, Parser),
+    Phase (Lexing, Parsing),
     Severity (Error),
     Snippet (..),
   )
@@ -211,10 +211,10 @@ popStartCode = modify go
 
 -- | Errors
 makeLexerError :: [Snippet] -> ParserM a
-makeLexerError snippets = throwError (Diagnostic Error Lexer snippets)
+makeLexerError snippets = throwError (Diagnostic Error Lexing snippets)
 
 makeParserError :: [Snippet] -> ParserM a
-makeParserError snippets = throwError (Diagnostic Error Parser snippets)
+makeParserError snippets = throwError (Diagnostic Error Parsing snippets)
 
 invalidLexemeError :: Position -> ParserM a
 invalidLexemeError pos = makeLexerError [Snippet (Span pos pos) "Invalid lexeme"]
