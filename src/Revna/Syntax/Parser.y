@@ -95,7 +95,7 @@ Exprs
 
 LetBlock :: { NE.NonEmpty (Name, Tree, Tree) }
 LetBlock
-  : vopen LetDecls vclose              { $2 }
+  : vopen LetDecls vclose                         { $2 }
 
 LetDecls :: { NE.NonEmpty (Name, Tree, Tree) }
   : LetBinder vsemi LetDecls                      { NE.cons $1 $3 }

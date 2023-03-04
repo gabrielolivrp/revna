@@ -14,5 +14,5 @@ main = do
   --   Left err -> print err
 
   case runParseModule filepath contents of
-    Right tree -> print tree
+    Right tree -> print (translModule tree)
     Left err -> print err

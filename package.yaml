@@ -25,6 +25,7 @@ dependencies:
   - containers
   - array
   - mtl
+  - prettyprinter
   - test-framework
   - test-framework-quickcheck2
   - QuickCheck
