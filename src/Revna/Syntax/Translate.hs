@@ -1,3 +1,5 @@
+{-# OPTIONS_GHC -Wno-incomplete-uni-patterns #-}
+
 module Revna.Syntax.Translate
   ( translModule,
     translTopLevel,
@@ -31,22 +33,17 @@ translTree (Tr.Var sp name) =
       let name' = translName name
        in Tm.TmPos sp (Tm.TmVar name')
 translTree (Tr.Lam sp (b NE.:| bs) body) =
-  let body' = translTree body
-   in Tm.TmPos sp $ translLam body' (b : bs) Tm.TmLam
+  Tm.TmPos sp $ translLam body (b : bs) Tm.TmLam
 translTree (Tr.App sp funct (a NE.:| as)) =
-  let sp' = sp <> getSpan (last (a : as))
-      funct' = Tm.TmPos sp' $ Tm.TmApp (translTree funct) (translTree a)
-   in foldl (\f@(Tm.TmPos ps _) a' -> Tm.TmPos (ps <> getSpan a') $ Tm.TmApp f (translTree a')) funct' as
+  let funct' = Tm.TmPos sp $ Tm.TmApp (translTree funct) (translTree a)
+   in foldl (\f@(Tm.TmPos sp' _) a' -> Tm.TmPos (sp' <> getSpan a') $ Tm.TmApp f (translTree a')) funct' as
 translTree (Tr.Forall sp (b NE.:| bs) body) =
-  let sp' = sp <> getSpan (last (b : bs))
-      body' = translTree body
-   in Tm.TmPos sp' $ translLam body' (b : bs) Tm.TmForall
+  Tm.TmPos sp $ translLam body (b : bs) Tm.TmForall
 translTree (Tr.Arrow sp param body) =
   let param' = translTree param
       body' = translTree body
    in Tm.TmPos sp $ Tm.TmForall (Tm.Name "_") param' body'
-translTree (Tr.Let _sp (b NE.:| bs) body) =
-  translLet body (b : bs)
+translTree (Tr.Let _sp (b NE.:| bs) body) = translLet body (b : bs)
 translTree (Tr.Id sp expr1 expr2) =
   Tm.TmPos sp $ Tm.TmId (translTree expr1) (translTree expr2)
 
@@ -62,15 +59,15 @@ translLet body ((sp, param, typ, expr) : xs) =
    in Tm.TmPos ((sp <> sp') <> sp'') $ Tm.TmApp funct argum
 
 translLam ::
-  Tm.Term ->
+  Tr.Tree ->
   [Tr.Bind] ->
   (Tm.Name -> Tm.Term -> Tm.Term -> Tm.Term) ->
   Tm.Term
-translLam body [] _ = body
+translLam body [] _ = translTree body
 translLam body (bind : xs) f =
   let (sp, name', typ') = translBind bind
       body'@(Tm.TmPos sp' _) = translLam body xs f
-   in Tm.TmPos (sp <> sp') $ f name' typ' body'
+   in Tm.TmPos (sp' <> sp) $ f name' typ' body'
 
 translBind :: Tr.Bind -> (Span, Tm.Name, Tm.Term)
 translBind (Tr.Bind sp name typ) = (sp, translName name, translTree typ)
