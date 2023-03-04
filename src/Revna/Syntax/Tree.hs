@@ -27,11 +27,11 @@ data Tree
   | -- | function types `∀(a_1: Type_1) (a_2: Type_2)...(a_n: Type_n), a -> b`
     Forall Span (NE.NonEmpty Bind) Tree
   | -- | let expression `let x: type = M in N`
-    Let Span (NE.NonEmpty (Name, Tree, Tree)) Tree
+    Let Span (NE.NonEmpty (Span, Name, Tree, Tree)) Tree
   | -- | arrow type `a -> b`
     Arrow Span Tree Tree
   | -- | Expr = Expr
-    Eq Span Tree Tree
+    Id Span Tree Tree
   deriving (Show, Eq)
 
 data TopLevel
@@ -54,7 +54,7 @@ instance HasSpan Tree where
     Forall sp _ _ -> sp
     Let sp _ _ -> sp
     Arrow sp _ _ -> sp
-    Eq sp _ _ -> sp
+    Id sp _ _ -> sp
 
 instance HasSpan TopLevel where
   getSpan = \case

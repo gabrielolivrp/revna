@@ -15,50 +15,51 @@ translModule (Tr.Module name topLevels) =
   Tm.Module (translName name) (map translTopLevel topLevels)
 
 translTopLevel :: Tr.TopLevel -> Tm.TopLevel
-translTopLevel (Tr.FunTypeDecl sp name expr) =
-  Tm.FunTypeSig sp (translName name) (translTree expr)
-translTopLevel (Tr.FunDecl sp name expr) =
-  Tm.FunDecl sp (translName name) (translTree expr)
-translTopLevel (Tr.PostulateDecl sp name expr) =
-  Tm.PostulateDecl sp (translName name) (translTree expr)
+translTopLevel (Tr.FunTypeDecl _ name expr) =
+  Tm.FunTypeSig (translName name) (translTree expr)
+translTopLevel (Tr.FunDecl _ name expr) =
+  Tm.FunDecl (translName name) (translTree expr)
+translTopLevel (Tr.PostulateDecl _ name expr) =
+  Tm.PostulateDecl (translName name) (translTree expr)
 
 translTree :: Tr.Tree -> Tm.Term
-translTree (Tr.Var sp var) =
-  case var of
-    Tr.Name "Type" -> Tm.TmType sp
-    Tr.Name "Refl" -> Tm.TmRefl sp
-    _ -> Tm.TmVar sp (translName var)
+translTree (Tr.Var sp name) =
+  case name of
+    Tr.Name "Type" -> Tm.TmPos sp Tm.TmType
+    Tr.Name "Refl" -> Tm.TmPos sp Tm.TmRefl
+    _ ->
+      let name' = translName name
+       in Tm.TmPos sp (Tm.TmVar name')
 translTree (Tr.Lam sp (b NE.:| bs) body) =
   let body' = translTree body
-   in translLam body' (b : bs) (Tm.TmLam sp)
+   in Tm.TmPos sp $ translLam body' (b : bs) Tm.TmLam
 translTree (Tr.App sp funct (a NE.:| as)) =
-  let lastArgumSpan = getSpan (last (a : as))
-      funct' = Tm.TmApp (sp <> lastArgumSpan) (translTree funct) (translTree a)
-   in foldl (\f a' -> Tm.TmApp (getSpan f <> getSpan a') f (translTree a')) funct' as
+  let sp' = sp <> getSpan (last (a : as))
+      funct' = Tm.TmPos sp' $ Tm.TmApp (translTree funct) (translTree a)
+   in foldl (\f@(Tm.TmPos ps _) a' -> Tm.TmPos (ps <> getSpan a') $ Tm.TmApp f (translTree a')) funct' as
 translTree (Tr.Forall sp (b NE.:| bs) body) =
-  let lastBindSpan = getSpan (last (b : bs))
+  let sp' = sp <> getSpan (last (b : bs))
       body' = translTree body
-   in translLam body' (b : bs) (Tm.TmForall (sp <> lastBindSpan))
+   in Tm.TmPos sp' $ translLam body' (b : bs) Tm.TmForall
 translTree (Tr.Arrow sp param body) =
   let param' = translTree param
       body' = translTree body
-   in Tm.TmForall sp (Tm.Name "_") param' body'
+   in Tm.TmPos sp $ Tm.TmForall (Tm.Name "_") param' body'
 translTree (Tr.Let _sp (b NE.:| bs) body) =
-  let body' = translTree body
-   in translLet body' (b : bs)
-translTree (Tr.Eq sp t1 t2) =
-  Tm.TmEq sp (translTree t1) (translTree t2)
+  translLet body (b : bs)
+translTree (Tr.Id sp expr1 expr2) =
+  Tm.TmPos sp $ Tm.TmId (translTree expr1) (translTree expr2)
 
 translLet ::
-  Tm.Term ->
-  [(Tr.Name, Tr.Tree, Tr.Tree)] ->
+  Tr.Tree ->
+  [(Span, Tr.Name, Tr.Tree, Tr.Tree)] ->
   Tm.Term
-translLet body [] = body
-translLet body ((param, typ, expr) : xs) =
-  let body' = translLet body xs
-      argum = translTree expr
-      funct = Tm.TmLam (getSpan body' <> getSpan body) (translName param) (translTree typ) body'
-   in Tm.TmApp (getSpan funct <> getSpan argum) funct argum
+translLet body [] = translTree body
+translLet body ((sp, param, typ, expr) : xs) =
+  let body'@(Tm.TmPos sp' _) = translLet body xs
+      argum@(Tm.TmPos sp'' _) = translTree expr
+      funct = Tm.TmPos (sp <> sp') $ Tm.TmLam (translName param) (translTree typ) body'
+   in Tm.TmPos ((sp <> sp') <> sp'') $ Tm.TmApp funct argum
 
 translLam ::
   Tm.Term ->
@@ -67,9 +68,9 @@ translLam ::
   Tm.Term
 translLam body [] _ = body
 translLam body (bind : xs) f =
-  let (_, name', typ') = translBind bind
-      body' = translLam body xs f
-   in f name' typ' body'
+  let (sp, name', typ') = translBind bind
+      body'@(Tm.TmPos sp' _) = translLam body xs f
+   in Tm.TmPos (sp <> sp') $ f name' typ' body'
 
 translBind :: Tr.Bind -> (Span, Tm.Name, Tm.Term)
 translBind (Tr.Bind sp name typ) = (sp, translName name, translTree typ)

@@ -1,27 +1,4 @@
 module Main where
 
-Either : Type -> Type -> Type
-Either =
-  λa: Type =>
-  λb: Type =>
-  forall (r : Type), (a -> r) -> (b -> r) -> r
-
-Left : forall (a : Type) (b : Type), a -> Either a b
-Left =
-  λa: Type =>
-  λb: Type =>
-  λx: a =>
-  λr: Type =>
-  λleft1: (a -> r) =>
-  λright1: (b -> r) =>
-  left1 x
-
-Right : forall (a : Type) (b : Type), b -> Either a b
-Right =
-  λa: Type =>
-  λb: Type =>
-  λy: b =>
-  λr: Type =>
-  λleft1: (a -> r) =>
-  λright1: (b -> r) =>
-  right1 y
+id : forall a: Type, a -> a
+id = \(a: Type) (x: a) => x

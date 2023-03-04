@@ -23,19 +23,25 @@ data Position = Position
     -- | absolute file path of the file
     posFilepath :: !FilePath
   }
-  deriving (Show, Eq, Ord)
+  deriving (Eq, Ord)
+
+instance Show Position where
+  show (Position o l c f) = show l <> ":" <> show c
 
 data Span = Span
   { spanStart :: !Position,
     spanEnd :: !Position
   }
-  deriving (Show, Eq)
-
-data Loc a = Loc a Span
-  deriving (Show)
+  deriving (Eq)
 
 instance Semigroup Span where
   (Span s1 e1) <> (Span s2 e2) = Span (min s1 s2) (max e1 e2)
+
+instance Show Span where
+  show (Span s e) = "(" <> show s <> "-" <> show e <> ")"
+
+data Loc a = Loc a Span
+  deriving (Show)
 
 startPos :: FilePath -> Position
 startPos = Position 0 1 1

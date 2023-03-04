@@ -85,7 +85,7 @@ Expr
   | Expr "->" Expr                                { Arrow (withSpan2 $1 $3) $1 $3 }
   | Expr Exprs                                    { App (withSpan2 $1 ((NE.head . NE.reverse) $2)) $1 $2 }
   | let LetBlock in Expr                          { Let (withSpan2 $1 $4) $2 $4 }
-  | Expr "=" Expr                                 { Eq (withSpan2 $1 $3) $1 $3 }
+  | Expr "=" Expr                                 { Id (withSpan2 $1 $3) $1 $3 }
   | Atom                                          { $1 }
 
 Exprs :: { NE.NonEmpty Tree }
@@ -93,17 +93,17 @@ Exprs
   : Expr Exprs                                    { NE.cons $1 $2 }
   | Expr                                          { NE.singleton $1 }
 
-LetBlock :: { NE.NonEmpty (Name, Tree, Tree) }
+LetBlock :: { NE.NonEmpty (Span, Name, Tree, Tree) }
 LetBlock
   : vopen LetDecls vclose                         { $2 }
 
-LetDecls :: { NE.NonEmpty (Name, Tree, Tree) }
+LetDecls :: { NE.NonEmpty (Span, Name, Tree, Tree) }
   : LetBinder vsemi LetDecls                      { NE.cons $1 $3 }
   | LetBinder                                     { NE.singleton $1 }
 
-LetBinder :: { (Name, Tree, Tree) }
+LetBinder :: { (Span, Name, Tree, Tree) }
 LetBinder
-  : name ":" Expr "=" Expr                        { (getName $1, $3, $5) }
+  : name ":" Expr "=" Expr                        { (getSpan $1 <> getSpan $5, getName $1, $3, $5) }
 
 Binder :: { Bind }
 Binder
