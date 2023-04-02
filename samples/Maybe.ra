@@ -1,0 +1,10 @@
+module Maybe where
+
+Maybe : Type -> Type
+Maybe = \a: Type => ∀(m: Type), ∀(n: m), ∀(j: ∀(v: a), m), m
+
+Just : forall a: Type, a -> Maybe a
+Just = \(a: Type) (x: a) (m: Type) (n: m) (j: ∀(v : a), m) => j x
+
+Nothing : forall a: Type, Maybe a
+Nothing = \(a: Type) (m: Type) (n: m) (j: ∀(v: a), m) => n

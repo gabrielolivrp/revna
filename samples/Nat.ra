@@ -1,0 +1,34 @@
+module Nat where
+
+Nat : Type
+Nat = ∀a: Type, (a -> a) -> a -> a
+
+succ : Nat -> Nat
+succ = \(n: Nat) (a: Type) (f: (a -> a)) (x: a) => f (n a f x)
+
+zero : Nat
+zero = \(a: Type) (f: (a -> a)) (x: a) => x
+
+one : Nat
+one = succ zero
+
+two : Nat
+two = succ one
+
+three : Nat
+three = succ two
+
+four : Nat
+four = succ three
+
+add : Nat -> Nat -> Nat
+add = \(n: Nat) (k: Nat) => n Nat succ k
+
+mult : Nat -> Nat -> Nat
+mult = \(n: Nat) (m: Nat) => n Nat (add m) zero
+
+pow : Nat -> Nat -> Nat
+pow = \(n: Nat) (m: Nat) => m Nat (mult n) one
+
+goal1 : ∀(a: Nat), a = a
+goal1 = \(a: Nat) => Refl

@@ -1,0 +1,8 @@
+module Equality where
+
+Eq : ∀(a: Type), a -> a -> Type
+Eq = \(a: Type) (x: a) (y: a) =>
+  ∀(p : ∀(c : Type), c -> Type), ((p a) x) -> ((p a) y)
+
+Rfl : ∀(a : Type) (x : a), Eq a x x
+Rfl = \(a: Type) (x: a) (p: (∀(c: Type), c -> Type)) (px: (p a x)) => px

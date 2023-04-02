@@ -24,6 +24,8 @@ source-repository head
 
 library
   exposed-modules:
+      Revna.Context
+      Revna.Core.Normal
       Revna.Core.Term
       Revna.Diagnostic
       Revna.Location
@@ -34,6 +36,8 @@ library
       Revna.Syntax.Token
       Revna.Syntax.Translate
       Revna.Syntax.Tree
+      Revna.Typer.Env
+      Revna.Typer.Infer
   other-modules:
       Paths_revna
   hs-source-dirs:

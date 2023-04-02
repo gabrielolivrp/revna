@@ -1,0 +1,14 @@
+module List where
+
+List : Type -> Type
+List = \a : Type => (forall r : Type, (a -> r -> r) -> r -> r)
+
+Nil : forall a: Type, (List a)
+Nil = \a : Type => (\r : Type => \f : (a -> r -> r) => \b : r => b)
+
+Cons : forall a: Type, a -> (List a) -> (List a)
+Cons = \(a: Type) (x: a) (xs: (List a)) (r: Type) (f: (a -> r -> r)) (b : r) => f x (xs r f b)
+
+map : forall (a: Type) (b: Type), (a -> b) -> (List a) -> (List b)
+map = \(a: Type) (b: Type) (f: (a -> b)) (xs: (List a)) =>
+  xs (List b) (\(x: a) (y: List b) => Cons b (f x) y) (Nil b)

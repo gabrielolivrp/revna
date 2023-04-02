@@ -1,0 +1,10 @@
+module Either where
+
+Either : Type -> Type -> Type
+Either = \(a: Type) (b: Type) => forall (e : Type), (a -> e) -> (b -> e) -> e
+
+Left : forall (a : Type) (b : Type), a -> Either a b
+Left = \(a: Type) (b: Type) (x: a) (e: Type) (left1: (a -> e)) (right1: (b -> e)) => left1 x
+
+Right : forall (a : Type) (b : Type), b -> Either a b
+Right = \(a: Type) (b: Type) (x: b) (e: Type) (left1: (a -> e)) (right1: (b -> e)) => right1 x

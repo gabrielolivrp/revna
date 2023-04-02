@@ -26,7 +26,7 @@ data Position = Position
   deriving (Eq, Ord)
 
 instance Show Position where
-  show (Position o l c f) = show l <> ":" <> show c
+  show (Position _ l c _) = show l <> ":" <> show c
 
 data Span = Span
   { spanStart :: !Position,
